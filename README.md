@@ -2,7 +2,15 @@
 
 Bot Telegram yang memantau link *share location* Grab (`https://sharelocation.grab.com/o/XXXX`)
 dan mengirim notifikasi saat status pesanan berubah, ETA berubah, dan saat driver sudah dekat.
-Berjalan gratis di GitHub Actions — tidak perlu laptop menyala, tidak perlu aplikasi Grab.
+Berjalan gratis di Cloudflare Workers — tidak perlu laptop menyala, tidak perlu aplikasi Grab.
+
+Tiga cara menjalankan, pilih salah satu:
+
+| Cara | Kecepatan | Catatan |
+| --- | --- | --- |
+| Cloudflare Workers (`cloudflare/worker.js`) | balasan instan, cek status tiap 1 menit | **disarankan**, setup lewat dashboard |
+| GitHub Actions (`track.py`) | cron 5 menit, sering telat/dilewati GitHub | cadangan |
+| Jalan sendiri (`grab_tracker.py --bot`) | real-time | butuh komputer/VPS menyala |
 
 ## Cara pakai (setelah terpasang)
 
@@ -12,7 +20,19 @@ Kirim ke bot Telegram-mu:
 - `/status` → status semua pesanan yang dipantau
 - `/stop` → hentikan pemantauan
 
-## Pemasangan (semua lewat browser, tanpa install apa pun)
+## Pemasangan A — Cloudflare Workers (disarankan)
+
+1. Buat bot di [@BotFather](https://t.me/BotFather) (`/newbot`), salin tokennya, lalu chat bot barumu sekali.
+2. Cloudflare dashboard → **Storage & Databases → KV → Create instance**, nama `grab-orders`.
+3. **Compute (Workers) → Create → Hello World → Deploy**, lalu **Edit code**: hapus isinya, paste seluruh
+   [`cloudflare/worker.js`](cloudflare/worker.js), **Deploy**.
+4. **Settings → Variables and Secrets**: tambah *Secret* `BOT_TOKEN` = token bot.
+5. **Settings → Bindings → KV namespace**: variable `ORDERS` → namespace `grab-orders`.
+6. **Settings → Trigger Events → Cron**: isi `* * * * *`.
+7. Aktifkan webhook, buka di browser (ganti TOKEN dan URL worker):
+   `https://api.telegram.org/bot<TOKEN>/setWebhook?url=https://<worker>.workers.dev/tg`
+
+## Pemasangan B — GitHub Actions (semua lewat browser, tanpa install apa pun)
 
 1. **Buat bot Telegram**: chat [@BotFather](https://t.me/BotFather) → `/newbot` → ikuti petunjuk →
    salin token yang diberikan (bentuknya `123456:ABC-DEF...`).

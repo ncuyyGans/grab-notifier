@@ -1,6 +1,7 @@
 name: Pantau pesanan Grab
 
 on:
+  # Cron GitHub sering telat/dilewati; versi utama ada di cloudflare/worker.js
   schedule:
     - cron: "*/5 * * * *"
   workflow_dispatch:
