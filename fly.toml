@@ -1,0 +1,35 @@
+# Fly.io configuration for Grab Notifier Bot
+app = "grab-notifier-bot"
+primary_region = "sin"  # Singapore region (closest to Indonesia)
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  PYTHONUNBUFFERED = "1"
+  PORT = "8080"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "256mb"
+
+# Cron job untuk polling setiap menit
+[[services]]
+  internal_port = 8080
+  protocol = "tcp"
+
+[checks]
+  [checks.alive]
+    grace_period = "5s"
+    interval = "30s"
+    method = "GET"
+    path = "/health"
+    port = 8080
+    timeout = "2s"
